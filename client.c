@@ -34,7 +34,7 @@ int main()
     bytes_written = write(socket_fd, http_request, request_length);
     if (bytes_written == -1)
     {
-        perror("write");
+        perror("write failed");
         cleanup(socket_fd);
         exit(EXIT_FAILURE);
     }
@@ -50,7 +50,7 @@ int main()
     bytes_read = read(socket_fd, buffer, BUFFER_SIZE - 1);
     if (bytes_read == -1)
     {
-        perror("read");
+        perror("read failed");
         cleanup(socket_fd);
         exit(EXIT_FAILURE);
     }

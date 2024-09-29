@@ -30,7 +30,7 @@ int main()
     }
     if (listen(socket_fd, 3) == -1)
     {
-        perror("listen");
+        perror("listen failed");
         cleanup(socket_fd);
         exit(EXIT_FAILURE);
     }
@@ -42,13 +42,13 @@ int main()
         int client_socket_fd = accept(socket_fd, (struct sockaddr *)&socket_address, (socklen_t *)&address_length);
         if (client_socket_fd == -1)
         {
-            perror("accept");
+            perror("accept failed");
             continue;
         }
         bytes_read = read(client_socket_fd, buffer, BUFFER_SIZE);
         if (bytes_read == -1)
         {
-            perror("read");
+            perror("read failed");
             cleanup(client_socket_fd);
             continue;
         }
@@ -65,7 +65,7 @@ int main()
         bytes_written = write(client_socket_fd, http_response, response_length);
         if (bytes_written == -1)
         {
-            perror("write");
+            perror("write failed");
         }
         else if (bytes_written < response_length)
         {
