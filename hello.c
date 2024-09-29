@@ -8,40 +8,47 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024
 
+void cleanup(int socket_fd)
+{
+    if (socket_fd == -1)
+    {
+        return;
+    }
+
+    if (close(socket_fd) == -1)
+    {
+        perror("Error closing socket");
+    }
+}
+
 int main()
 {
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    address.sin_port = htons(PORT);
+    struct sockaddr_in socket_address;
+    socket_address.sin_family = AF_INET;
+    socket_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    socket_address.sin_port = htons(PORT);
 
-    int addrlen = sizeof(address);
-    int server_fd, new_socket;
+    int address_length = sizeof(socket_address);
     char buffer[BUFFER_SIZE] = {0};
     char *http_response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n";
     ssize_t bytes_read, bytes_written;
 
-    // ソケットの作成
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd == -1)
+    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd == -1)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
-
-    // ソケットをアドレスとポートにバインド
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) == -1)
+    if (bind(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1)
     {
         perror("bind failed");
-        close(server_fd);
+        cleanup(socket_fd);
         exit(EXIT_FAILURE);
     }
-
-    // 接続のリッスン
-    if (listen(server_fd, 3) == -1)
+    if (listen(socket_fd, 3) == -1)
     {
         perror("listen");
-        close(server_fd);
+        cleanup(socket_fd);
         exit(EXIT_FAILURE);
     }
 
@@ -49,38 +56,36 @@ int main()
 
     while (1)
     {
-        // 新しい接続を受け入れる
-        new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-        if (new_socket == -1)
+        int client_socket_fd = accept(socket_fd, (struct sockaddr *)&socket_address, (socklen_t *)&address_length);
+        if (client_socket_fd == -1)
         {
             perror("accept");
-            continue; // エラー時も終了せずに次の接続を待つ
+            continue;
         }
-
-        // クライアントからのデータを読み取る
-        bytes_read = read(new_socket, buffer, BUFFER_SIZE);
+        bytes_read = read(client_socket_fd, buffer, BUFFER_SIZE);
         if (bytes_read == -1)
         {
             perror("read");
-            close(new_socket);
+            cleanup(client_socket_fd);
             continue;
         }
         else if (bytes_read == 0)
         {
             printf("Client closed the connection\n");
-            close(new_socket);
+            cleanup(client_socket_fd);
             continue;
         }
+
         printf("Received a connection\n");
 
-        // 空の本文を持つHTTP 200 OKレスポンスを送信
-        size_t response_len = strlen(http_response);
-        bytes_written = write(new_socket, http_response, response_len);
+        // 疎通確認だけ行うため空の HTTP 200 OK レスポンスを送信
+        size_t response_length = strlen(http_response);
+        bytes_written = write(client_socket_fd, http_response, response_length);
         if (bytes_written == -1)
         {
             perror("write");
         }
-        else if (bytes_written < response_len)
+        else if (bytes_written < response_length)
         {
             fprintf(stderr, "Partial write occurred\n");
         }
@@ -89,17 +94,9 @@ int main()
             printf("Sent HTTP 200 OK response\n");
         }
 
-        // ソケットを閉じる
-        if (close(new_socket) == -1)
-        {
-            perror("close");
-        }
+        cleanup(client_socket_fd);
     }
 
-    // メインのサーバーソケットを閉じる
-    if (close(server_fd) == -1)
-    {
-        perror("close");
-    }
+    cleanup(socket_fd);
     return 0;
 }
