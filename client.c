@@ -21,7 +21,6 @@ int main()
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
-
     if (connect(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1)
     {
         perror("connect failed");
