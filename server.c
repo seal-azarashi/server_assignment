@@ -1,31 +1,14 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <arpa/inet.h>
 #include <errno.h>
-
-#define PORT 8080
-#define BUFFER_SIZE 1024
-
-void cleanup(int socket_fd)
-{
-    if (socket_fd == -1)
-    {
-        return;
-    }
-
-    if (close(socket_fd) == -1)
-    {
-        perror("Error closing socket");
-    }
-}
+#include "common_utils.h"
 
 int main()
 {
     struct sockaddr_in socket_address;
     socket_address.sin_family = AF_INET;
-    socket_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    socket_address.sin_addr.s_addr = inet_addr(LOOPBACK_ADDRESS);
     socket_address.sin_port = htons(PORT);
 
     int address_length = sizeof(socket_address);
@@ -52,7 +35,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on localhost (127.0.0.1), port %d\n", PORT);
+    printf("Server listening on %s, port %d\n", LOOPBACK_ADDRESS, PORT);
 
     while (1)
     {
@@ -78,7 +61,6 @@ int main()
 
         printf("Received a connection\n");
 
-        // 疎通確認だけ行うため空の HTTP 200 OK レスポンスを送信
         size_t response_length = strlen(http_response);
         bytes_written = write(client_socket_fd, http_response, response_length);
         if (bytes_written == -1)

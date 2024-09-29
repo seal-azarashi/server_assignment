@@ -7,14 +7,18 @@
 MacOS の場合、ルートディレクトリで次のコマンドを実行して起動できます
 
 ```sh
-gcc server/server.c -o server/server.out && ./server/server.out
+gcc server.c -o server.out && ./server.out
 ```
 
-次のコマンドで疎通確認が可能です (TODO: client 用のファイルが出来たら削除)
+## client
+
+MacOS の場合、ルートディレクトリで次のコマンドを実行して起動できます
 
 ```sh
-curl -i http://localhost:8080
+gcc client.c -o client.out && ./client.out
 ```
+
+サーバーを立ち上げた上で起動することで動作確認が可能です。
 
 ## その他メモ
 
