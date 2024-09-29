@@ -15,3 +15,7 @@ gcc server/server.c -o server/server.out && ./server/server.out
 ```sh
 curl -i http://localhost:8080
 ```
+
+## その他メモ
+
+- try catch で囲んでエラーが発生したら stack trace を出す、みたいなのは出来ないのだろうか？
