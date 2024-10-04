@@ -80,5 +80,5 @@ int main()
     }
 
     cleanup(socket_fd);
-    return 0;
+    return EXIT_SUCCESS;
 }
