@@ -20,6 +20,8 @@ int main()
     check_error(socket_fd == -1, "socket failed", socket_fd);
     int bind_result = bind(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address));
     check_error(bind_result == -1, "bind failed", socket_fd);
+
+    // TODO: backlog の値は暫定で、スレッドの導入時に非機能要件を整理して再度値を決定する。
     int listen_result = listen(socket_fd, 3);
     check_error(listen_result == -1, "listen failed", socket_fd);
 
