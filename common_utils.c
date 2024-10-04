@@ -8,7 +8,8 @@ void cleanup(int socket_fd)
         return;
     }
 
-    if (close(socket_fd) == -1)
+    int close_result = close(socket_fd);
+    if (close_result == -1)
     {
         perror("Error closing socket");
     }
