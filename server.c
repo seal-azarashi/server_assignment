@@ -18,8 +18,10 @@ int main()
 
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     check_error(socket_fd == -1, "socket failed", socket_fd);
-    check_error(bind(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1, "bind failed", socket_fd);
-    check_error(listen(socket_fd, 3) == -1, "listen failed", socket_fd);
+    int bind_result = bind(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address));
+    check_error(bind_result == -1, "bind failed", socket_fd);
+    int listen_result = listen(socket_fd, 3);
+    check_error(listen_result == -1, "listen failed", socket_fd);
 
     printf("Server listening on %s, port %d\n", LOOPBACK_ADDRESS, PORT);
 
