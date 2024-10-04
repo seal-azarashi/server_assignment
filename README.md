@@ -9,13 +9,13 @@
 まずはサーバーを起動します。MacOS の場合、ルートディレクトリで次のコマンドを実行します。
 
 ```sh
-gcc server.c -o server.out && ./server.out
+make server
 ```
 
 クライアントを実行します。MacOS の場合、ルートディレクトリで次のコマンドを実行します。
 
 ```sh
-gcc client.c -o client.out && ./client.out
+make client
 ```
 
 それぞれプリントされる実行結果を確認してください。
