@@ -9,5 +9,6 @@
 #define LOOPBACK_ADDRESS "127.0.0.1"
 
 void cleanup(int socket_fd);
+void check_error(int is_error, const char *message, int socket_fd);
 
 #endif

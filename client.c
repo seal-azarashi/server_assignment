@@ -16,45 +16,23 @@ int main()
     ssize_t bytes_read, bytes_written;
 
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd == -1)
-    {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
-    }
-    if (connect(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1)
-    {
-        perror("connect failed");
-        cleanup(socket_fd);
-        exit(EXIT_FAILURE);
-    }
+    check_error(socket_fd == -1, "socket failed", socket_fd);
+    int connect_result = connect(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address));
+    check_error(connect_result == -1, "connect failed", socket_fd);
 
     printf("Connected to server on localhost (%s), port %d\n", LOOPBACK_ADDRESS, PORT);
 
     size_t request_length = strlen(http_request);
     bytes_written = write(socket_fd, http_request, request_length);
-    if (bytes_written == -1)
-    {
-        perror("write failed");
-        cleanup(socket_fd);
-        exit(EXIT_FAILURE);
-    }
-    else if (bytes_written < request_length)
-    {
-        fprintf(stderr, "Partial write occurred\n");
-        cleanup(socket_fd);
-        exit(EXIT_FAILURE);
-    }
+    check_error(bytes_written == -1, "write failed", socket_fd);
+    check_error(bytes_written < request_length, "Partial write occurred", socket_fd);
 
     printf("Sent HTTP GET request\n");
 
     bytes_read = read(socket_fd, buffer, BUFFER_SIZE - 1);
-    if (bytes_read == -1)
-    {
-        perror("read failed");
-        cleanup(socket_fd);
-        exit(EXIT_FAILURE);
-    }
-    else if (bytes_read == 0)
+    check_error(bytes_read == -1, "read failed", socket_fd);
+
+    if (bytes_read == 0)
     {
         printf("Server closed the connection\n");
     }
