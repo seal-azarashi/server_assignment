@@ -9,4 +9,4 @@ server: server.c $(COMMON_UTILS)
 
 client: client.c $(COMMON_UTILS)
 	$(CC) -o client.out $^
-	./client.out
+	./client.out $(IP_ADDRESS)

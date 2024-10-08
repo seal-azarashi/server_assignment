@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define PORT 8080
+#define PORT "8080"
 #define BUFFER_SIZE 1024
-#define LOOPBACK_ADDRESS "127.0.0.1"
 
 void cleanup(int socket_fd);
 void check_error(int is_error, const char *message, int socket_fd);

@@ -4,23 +4,26 @@
 #include <errno.h>
 #include "common_utils.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    struct sockaddr_in socket_address;
-    socket_address.sin_family = AF_INET;
-    socket_address.sin_addr.s_addr = inet_addr(LOOPBACK_ADDRESS);
-    socket_address.sin_port = htons(PORT);
+    const char *host = (argc > 1) ? argv[1] : "::1";
+
+    struct sockaddr_in6 socket_address;
+    socket_address.sin6_family = AF_INET6;
+    inet_pton(AF_INET6, host, &socket_address.sin6_addr);
+    socket_address.sin6_port = htons(atoi(PORT));
 
     char buffer[BUFFER_SIZE] = {0};
     char *http_request = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
     ssize_t bytes_read, bytes_written;
 
-    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
     check_error(socket_fd == -1, "socket failed", socket_fd);
+
     int connect_result = connect(socket_fd, (struct sockaddr *)&socket_address, sizeof(socket_address));
     check_error(connect_result == -1, "connect failed", socket_fd);
 
-    printf("Connected to server on localhost (%s), port %d\n", LOOPBACK_ADDRESS, PORT);
+    printf("Connected to server on %s, port %s\n", host, PORT);
 
     size_t request_length = strlen(http_request);
     bytes_written = write(socket_fd, http_request, request_length);

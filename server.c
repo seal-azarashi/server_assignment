@@ -9,7 +9,7 @@ int main()
     struct sockaddr_in6 socket_address;
     socket_address.sin6_family = AF_INET6;
     socket_address.sin6_addr = in6addr_any;
-    socket_address.sin6_port = htons(PORT);
+    socket_address.sin6_port = htons(atoi(PORT));
 
     int address_length = sizeof(socket_address);
     char buffer[BUFFER_SIZE] = {0};
@@ -30,7 +30,7 @@ int main()
     int listen_result = listen(socket_fd, 3);
     check_error(listen_result == -1, "listen failed", socket_fd);
 
-    printf("Server listening on port %d (IPv4 and IPv6)\n", PORT);
+    printf("Server listening on port %s (IPv4 and IPv6)\n", PORT);
 
     while (1)
     {
