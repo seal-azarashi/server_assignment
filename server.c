@@ -4,6 +4,31 @@
 #include <errno.h>
 #include "common_utils.h"
 
+ssize_t read_request(int socket, char *buffer, size_t max_size)
+{
+    size_t total_read = 0;
+    ssize_t bytes_read;
+    while (total_read < max_size)
+    {
+        bytes_read = read(socket, buffer + total_read, max_size - total_read);
+        if (bytes_read == -1)
+        {
+            return -1;
+        }
+        if (bytes_read == 0)
+        {
+            break;
+        }
+
+        total_read += bytes_read;
+        if (strstr(buffer, "\r\n\r\n") != NULL) // シンプルな GET リクエストのみが来る想定
+        {
+            break;
+        }
+    }
+    return total_read;
+}
+
 int main()
 {
     struct sockaddr_in6 socket_address;
@@ -12,7 +37,7 @@ int main()
     socket_address.sin6_port = htons(atoi(PORT));
 
     int address_length = sizeof(socket_address);
-    char buffer[BUFFER_SIZE] = {0};
+    char buffer[MAX_MESSAGE_SIZE] = {0};
     char *http_response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n";
     ssize_t bytes_read, bytes_written;
 
@@ -40,7 +65,7 @@ int main()
             perror("accept failed");
             continue;
         }
-        bytes_read = read(client_socket_fd, buffer, BUFFER_SIZE);
+        bytes_read = read_request(client_socket_fd, buffer, MAX_MESSAGE_SIZE - 1);
         if (bytes_read == -1)
         {
             perror("read failed");
@@ -55,9 +80,11 @@ int main()
         }
 
         printf("Received a connection\n");
+        buffer[bytes_read] = '\0';
+        printf("Received request:\n%s\n", buffer);
 
         size_t response_length = strlen(http_response);
-        bytes_written = write(client_socket_fd, http_response, response_length);
+        bytes_written = write_all(client_socket_fd, http_response, response_length);
         if (bytes_written == -1)
         {
             perror("write failed");

@@ -4,24 +4,6 @@
 #include <errno.h>
 #include "common_utils.h"
 
-// 死活監視用の API に対して送る想定で、 4KiB あれば溢れないと考えている
-#define MAX_RESPONSE_SIZE 4096
-
-int send_request(int socket, const char *buffer, size_t length)
-{
-    size_t total_sent = 0;
-    while (total_sent < length)
-    {
-        ssize_t sent = write(socket, buffer + total_sent, length - total_sent);
-        if (sent == -1)
-        {
-            return -1;
-        }
-        total_sent += sent;
-    }
-    return 0;
-}
-
 int receive_responce(int socket, char *buffer, size_t max_size)
 {
     size_t total_received = 0;
@@ -57,7 +39,7 @@ int main(int argc, char *argv[])
 
     char buffer[BUFFER_SIZE] = {0};
     char *http_request = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
-    char response[MAX_RESPONSE_SIZE] = {0};
+    char response[MAX_MESSAGE_SIZE] = {0};
 
     int socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
     check_error(socket_fd == -1, "socket failed", socket_fd);
@@ -68,12 +50,12 @@ int main(int argc, char *argv[])
     printf("Connected to server on %s, port %s\n", host, PORT);
 
     size_t request_length = strlen(http_request);
-    int send_result = send_request(socket_fd, http_request, request_length);
-    check_error(send_result == -1, "write failed", socket_fd);
+    int bytes_written = write_all(socket_fd, http_request, request_length);
+    check_error(bytes_written == -1, "write failed", socket_fd);
 
     printf("Sent HTTP GET request\n");
 
-    ssize_t total_received = receive_responce(socket_fd, response, MAX_RESPONSE_SIZE - 1);
+    ssize_t total_received = receive_responce(socket_fd, response, MAX_MESSAGE_SIZE - 1);
     check_error(total_received == -1, "read failed", socket_fd);
 
     if (total_received == 0)
