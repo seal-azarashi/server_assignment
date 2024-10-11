@@ -4,7 +4,7 @@
 #include <errno.h>
 #include "common_utils.h"
 
-int receive_responce(int socket, char *buffer, size_t max_size)
+int receive_response(int socket, char *buffer, size_t max_size)
 {
     size_t total_received = 0;
     while (1)
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     printf("Sent HTTP GET request\n");
 
-    ssize_t total_received = receive_responce(socket_fd, response, MAX_MESSAGE_SIZE - 1);
+    ssize_t total_received = receive_response(socket_fd, response, MAX_MESSAGE_SIZE - 1);
     check_error(total_received == -1, "read failed", socket_fd);
 
     if (total_received == 0)
