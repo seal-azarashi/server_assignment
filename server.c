@@ -21,7 +21,7 @@ ssize_t read_request(int socket, char *buffer, size_t max_size)
         }
 
         total_read += bytes_read;
-        if (strstr(buffer, "\r\n\r\n") != NULL) // シンプルな GET リクエストのみが来る想定
+        if (strstr(buffer, "\r\n\r\n") != NULL) // ボディのない GET リクエストのみが来る想定
         {
             break;
         }
