@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        response[total_received] = '\0'; // Null-terminate the received data
+        response[total_received] = '\0';
         printf("Received response:\n%s\n", response);
     }
 
